@@ -185,6 +185,15 @@ const sellFlowSteps = [
   },
 ];
 
+const expectationGuideRows = [
+  { label: "一字板", exceed: "> 5%", match: "5% - 3%", miss: "< 3%" },
+  { label: "10:00前", exceed: "> 4%", match: "3% - 1%", miss: "< 1%" },
+  { label: "10:00-11:30", exceed: "> 3%", match: "2% - 0%", miss: "< 0%" },
+  { label: "13:00-14:00", exceed: "> 2%", match: "2% - -0.5%", miss: "< -1%" },
+  { label: "14:00-15:00", exceed: "> 2%", match: "2% - -1%", miss: "< -2%" },
+  { label: "分歧烂板", exceed: "> 1%", match: "0% - -2%", miss: "< -2%" },
+];
+
 const glossaryCards = [
   {
     title: "试盘",
@@ -1427,9 +1436,78 @@ function buildReviewTemplateDetails(slide) {
   `;
 }
 
+function isExpectationGuideSlide(slide, kind) {
+  return kind === "basics" && String(slide?.eyebrow || "").trim() === "EXPECTATION GUIDE";
+}
+
+function renderExpectationGuideMedia() {
+  return `
+    <div class="custom-slide-media expectation-guide-card" aria-label="次日预期判断表">
+      <div class="expectation-guide-shell">
+        <table class="expectation-guide-table">
+          <thead>
+            <tr>
+              <th>首板涨停时间</th>
+              <th>次日超预期</th>
+              <th>符合预期</th>
+              <th>不及预期</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${expectationGuideRows
+              .map(
+                (row) => `
+                  <tr>
+                    <th scope="row">${escapeHtml(row.label)}</th>
+                    <td>${escapeHtml(row.exceed)}</td>
+                    <td>${escapeHtml(row.match)}</td>
+                    <td>${escapeHtml(row.miss)}</td>
+                  </tr>
+                `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderSlideMedia(slide, kind, summary) {
+  if (isExpectationGuideSlide(slide, kind)) {
+    return renderExpectationGuideMedia();
+  }
+
+  return `
+    <button
+      type="button"
+      class="thumb-button"
+      data-image="${escapeHtml(slide.image)}"
+      data-title="${escapeHtml(slide.title)}"
+      data-caption="${escapeHtml(summary)}"
+    >
+      <img src="${escapeHtml(slide.image)}" alt="${escapeHtml(slide.title)}">
+    </button>
+  `;
+}
+
 function buildSlideCardMarkup(parentName, sectionId, slide, kind) {
   const cardId = `${kind}-${sectionId}-${slide.number}`;
   const state = getCardState(cardId);
+  if (isExpectationGuideSlide(slide, kind)) {
+    slide = {
+      ...slide,
+      title: "次日预期分层：按当前环境修订",
+      subtitle: "这张表只做强弱分层，不单独作为买点",
+      summary: "先看次日是否超预期，再回到题材、承接、量能和分歧。",
+      points: [
+        "先按首板涨停时间分层，再看次日竞价是否落在超预期、符合预期还是不及预期区间。",
+        "它只是强弱分层表，不是机械买点；超预期也要结合题材强度、抛压和承接。",
+        "如果整体连板情绪不成立，这张表的参考价值也会明显下降。"
+      ],
+      pointLimit: 3,
+    };
+  }
   const isReviewTemplate = kind === "basics" && String(slide.eyebrow || "").startsWith("REVIEW TEMPLATE");
   const points =
     kind === "basics"
@@ -1507,15 +1585,7 @@ function buildSlideCardMarkup(parentName, sectionId, slide, kind) {
       data-noted="${hasStateNotes(state) ? "1" : "0"}"
       data-tagged="${getAllTags(state).length ? "1" : "0"}"
     >
-      <button
-        type="button"
-        class="thumb-button"
-        data-image="${escapeHtml(slide.image)}"
-        data-title="${escapeHtml(slide.title)}"
-        data-caption="${escapeHtml(summary)}"
-      >
-        <img src="${escapeHtml(slide.image)}" alt="${escapeHtml(slide.title)}">
-      </button>
+      ${renderSlideMedia(slide, kind, summary)}
 
       <div class="card-body">
         <div class="case-topline">
