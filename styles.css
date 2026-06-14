@@ -1404,7 +1404,7 @@ body.topbar-collapsed .topbar-nav {
 
 .expectation-guide-table {
   width: 100%;
-  min-width: 720px;
+  min-width: 1040px;
   border-collapse: collapse;
   color: rgba(248, 240, 233, 0.96);
   font-size: 14px;
@@ -1418,6 +1418,8 @@ body.topbar-collapsed .topbar-nav {
   font-size: 15px;
   font-weight: 800;
   text-align: left;
+  line-height: 1.45;
+  vertical-align: top;
 }
 
 .expectation-guide-table thead th:first-child {
@@ -1434,10 +1436,12 @@ body.topbar-collapsed .topbar-nav {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(12, 15, 22, 0.92);
   text-align: left;
+  line-height: 1.55;
+  vertical-align: top;
 }
 
 .expectation-guide-table tbody th {
-  width: 25%;
+  width: 14%;
   color: rgba(247, 241, 236, 0.9);
   font-weight: 700;
 }
@@ -1447,9 +1451,20 @@ body.topbar-collapsed .topbar-nav {
   font-weight: 600;
 }
 
+.expectation-guide-table thead th:nth-child(5),
+.expectation-guide-table thead th:nth-child(6),
+.expectation-guide-table tbody td:nth-child(5),
+.expectation-guide-table tbody td:nth-child(6) {
+  min-width: 170px;
+}
+
 .expectation-guide-table tbody tr:last-child th,
 .expectation-guide-table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.basic-study-card.expectation-guide-slide {
+  grid-column: 1 / -1;
 }
 
 .case-study-card .thumb-button img {
@@ -2100,8 +2115,12 @@ body.topbar-collapsed .topbar-nav {
   }
 
   .expectation-guide-table {
-    min-width: 640px;
+    min-width: 980px;
     font-size: 13px;
+  }
+
+  .basic-study-card.expectation-guide-slide {
+    grid-column: auto;
   }
 
   .expectation-guide-table thead th,

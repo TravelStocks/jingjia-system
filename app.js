@@ -186,12 +186,12 @@ const sellFlowSteps = [
 ];
 
 const expectationGuideRows = [
-  { label: "一字板", exceed: "> 5%", match: "5% - 3%", miss: "< 3%" },
-  { label: "10:00前", exceed: "> 4%", match: "3% - 1%", miss: "< 1%" },
-  { label: "10:00-11:30", exceed: "> 3%", match: "2% - 0%", miss: "< 0%" },
-  { label: "13:00-14:00", exceed: "> 2%", match: "2% - -0.5%", miss: "< -1%" },
-  { label: "14:00-15:00", exceed: "> 2%", match: "2% - -1%", miss: "< -2%" },
-  { label: "分歧烂板", exceed: "> 1%", match: "0% - -2%", miss: "< -2%" },
+  { label: "一字板", exceed: "> 5%", match: "5% - 3%", miss: "< 3%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
+  { label: "10:00前", exceed: "> 4%", match: "3% - 1%", miss: "< 1%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
+  { label: "10:00-11:30", exceed: "> 3%", match: "2% - 0%", miss: "< 0%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
+  { label: "13:00-14:00", exceed: "> 2%", match: "2% - -0.5%", miss: "< -1%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
+  { label: "14:00-15:00", exceed: "> 2%", match: "2% - -1%", miss: "< -2%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
+  { label: "分歧烂板", exceed: "> 1%", match: "0% - -2%", miss: "< -2%", openOne: "迅速拉高到符合预期区间", openFive: "大单涨停" },
 ];
 
 const glossaryCards = [
@@ -1451,6 +1451,8 @@ function renderExpectationGuideMedia() {
               <th>次日超预期</th>
               <th>符合预期</th>
               <th>不及预期</th>
+              <th>开盘1分钟</th>
+              <th>开盘5分钟</th>
             </tr>
           </thead>
           <tbody>
@@ -1462,6 +1464,8 @@ function renderExpectationGuideMedia() {
                     <td>${escapeHtml(row.exceed)}</td>
                     <td>${escapeHtml(row.match)}</td>
                     <td>${escapeHtml(row.miss)}</td>
+                    <td>${escapeHtml(row.openOne)}</td>
+                    <td>${escapeHtml(row.openFive)}</td>
                   </tr>
                 `
               )
@@ -1494,16 +1498,17 @@ function renderSlideMedia(slide, kind, summary) {
 function buildSlideCardMarkup(parentName, sectionId, slide, kind) {
   const cardId = `${kind}-${sectionId}-${slide.number}`;
   const state = getCardState(cardId);
-  if (isExpectationGuideSlide(slide, kind)) {
+  const isExpectationGuide = isExpectationGuideSlide(slide, kind);
+  if (isExpectationGuide) {
     slide = {
       ...slide,
       title: "次日预期分层：按当前环境修订",
-      subtitle: "这张表只做强弱分层，不单独作为买点",
-      summary: "先看次日是否超预期，再回到题材、承接、量能和分歧。",
+      subtitle: "把竞价预期和开盘 1 分钟、5 分钟的修复路径放到同一张表里看",
+      summary: "先看次日是否超预期，再看开盘 1 分钟和 5 分钟能否把弱开修回来。",
       points: [
         "先按首板涨停时间分层，再看次日竞价是否落在超预期、符合预期还是不及预期区间。",
-        "它只是强弱分层表，不是机械买点；超预期也要结合题材强度、抛压和承接。",
-        "如果整体连板情绪不成立，这张表的参考价值也会明显下降。"
+        "如果竞价本身不及预期，还要继续看开盘 1 分钟能否迅速修复到符合预期区间，开盘 5 分钟能否被大单直接拉到超预期。",
+        "它只是强弱分层表，不是机械买点；超预期也要结合题材强度、抛压、承接和整体连板情绪。"
       ],
       pointLimit: 3,
     };
@@ -1525,6 +1530,9 @@ function buildSlideCardMarkup(parentName, sectionId, slide, kind) {
     articleClasses.push("case-study-card");
   } else {
     articleClasses.push("basic-study-card");
+  }
+  if (isExpectationGuide) {
+    articleClasses.push("expectation-guide-slide");
   }
   if (isReviewTemplate) {
     articleClasses.push("review-template-card");
